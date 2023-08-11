@@ -12,3 +12,5 @@ yarn.lock
 lib
 
 src/utils/serviceAccounts
+
+/.env
