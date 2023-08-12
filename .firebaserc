@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "",
-    "dev": "",
-    "prod": ""
+    "default": "backend-auth-willeder",
+    "dev": "backend-auth-willeder",
+    "prod": "backend-auth-willeder"
   }
 }

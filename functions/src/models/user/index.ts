@@ -1,8 +1,6 @@
 import { db } from '../../utils/firebase';
 import { UserDocument, USER_COLLECTION_KEY } from './user.entity';
 
-
-
 export const addUser = async (user: UserDocument) => {
     try {
         const newUser = db.collection(USER_COLLECTION_KEY).add(user);
@@ -48,6 +46,19 @@ export const getUser = async (user_id: string) => {
     try {
         const userDoc = await db.collection(USER_COLLECTION_KEY).doc(user_id).get();
         return userDoc.data();
+    } catch (err) {
+        return Promise.reject(err);
+    }
+}
+
+export const checkPassword = async (email: string, password: string) => {
+    try {
+        const userDocs = await db.collection(USER_COLLECTION_KEY).where('email', '==', email).get();
+        const users = userDocs.docs.map(doc => doc.data() as UserDocument);
+        if (users.length === 0) return false;
+        const user = users[0];
+        if (user.password !== password) return false;
+        return true;
     } catch (err) {
         return Promise.reject(err);
     }
