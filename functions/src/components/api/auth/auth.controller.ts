@@ -8,7 +8,7 @@ import {
   dataNotExistException,
   unauthorizedException,
 } from '../../../utils/apiErrorHandler';
-// import { getUser, getUserByEmail, updateUserFields } from '../../../models/user';
+import { getUser, getUserByEmail, updateUserFields } from '../../../models/user';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -33,7 +33,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const refreshToken = encodeJwt({ id: user_id }, REFRESH_TOKEN_EXPIRED_IN || '2m', 'refresh');
 
     // TODO update refresh token
-    // await updateUserFields();
+    await updateUserFields(user_id, { refresh_token: refreshToken, updated_at: getCurrentJST() });
 
     res.status(200).json({ accessToken, refreshToken });
   } catch (err: any) {
@@ -48,7 +48,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     if (!user_id) throw badImplementationException('user_id is not set properly');
 
     // TODO updateUser for make the refresh token to be null
-    // await updateUserFields();
+    await updateUserFields(user_id, { refresh_token: null, updated_at: getCurrentJST() });
 
     res.status(200).json();
   } catch (err) {
@@ -62,12 +62,14 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     const { email } = req.body;
 
     // TODO implment getUserByEmail to get user detail
-    // const users = await getUserByEmail(email);
-    // if (users.length === 0) throw dataNotExistException('Email does not register');
-    // if (users.length > 1) throw badImplementationException('Something went wrong. Email is more than 1.');
-    // if (users[0].status !== 'active') throw unauthorizedException('This user is unauthorized.');
+    const users = await getUserByEmail(email);
 
-    // service.forgotPassword(users[0]);
+
+    if (users.length === 0) throw dataNotExistException('Email does not register');
+    if (users.length > 1) throw badImplementationException('Something went wrong. Email is more than 1.');
+    if (users[0].status !== 'active') throw unauthorizedException('This user is unauthorized.');
+
+    service.forgotPassword(users[0]);
 
     res.status(200).json();
   } catch (err: any) {
@@ -75,6 +77,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     next(err);
   }
 };
+
 
 export const updatePassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -95,21 +98,25 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
 
     const decoded = decodeJwt(refreshToken, 'refresh');
 
+    if (typeof decoded === 'string') {
+      throw new Error('Invalid JWT token');
+    }
+
     // TODO get user by id
-    // const user = await getUser(decoded.payload.id);
-    // if (!user) throw unauthorizedException('User is not exist');
-    // if (user.status !== 'active') throw unauthorizedException('This user is not active');
-    // if (user.refreshToken !== refreshToken) throw unauthorizedException('Refresh token is not valid');
+    const user = await getUser(decoded.payload.id);
+    if (!user) throw unauthorizedException('User is not exist');
+    if (user.status !== 'active') throw unauthorizedException('This user is not active');
+    if (user.refreshToken !== refreshToken) throw unauthorizedException('Refresh token is not valid');
 
     const { ACCESS_TOKEN_EXPIRED_IN, REFRESH_TOKEN_EXPIRED_IN } = process.env;
 
-    // const accessToken = encodeJwt({ id: user.user_id }, ACCESS_TOKEN_EXPIRED_IN || '5m', 'access');
-    // const newRefreshToken = encodeJwt({ id: user.user_id }, REFRESH_TOKEN_EXPIRED_IN || '30d', 'refresh');
+    const accessToken = encodeJwt({ id: user.user_id }, ACCESS_TOKEN_EXPIRED_IN || '5m', 'access');
+    const newRefreshToken = encodeJwt({ id: user.user_id }, REFRESH_TOKEN_EXPIRED_IN || '30d', 'refresh');
 
     // update refresh token
-    // await updateUserFields();
+    await updateUserFields(user.user_id, { refresh_token: newRefreshToken, updated_at: getCurrentJST() });
 
-    // res.status(200).json({ accessToken, refreshToken: newRefreshToken });
+    res.status(200).json({ accessToken, refreshToken: newRefreshToken });
   } catch (err: any) {
     logger.error(err);
     next(err);
