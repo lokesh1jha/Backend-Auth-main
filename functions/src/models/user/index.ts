@@ -63,3 +63,14 @@ export const checkPassword = async (email: string, password: string) => {
         return Promise.reject(err);
     }
 }
+
+export const getUserById = async (user_id: string) => {
+    try {
+        const userDocs = await db.collection(USER_COLLECTION_KEY).where('user_id', '==', user_id).get();
+        const users = userDocs.docs.map(doc => doc.data() as UserDocument);
+        if (users.length === 0) return null;
+        return users[0];
+    } catch (err) {
+        return Promise.reject(err);
+    }
+}
