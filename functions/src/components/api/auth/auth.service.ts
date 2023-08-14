@@ -89,7 +89,7 @@ export const updatePassword = async (password: string, tokenId: string) => {
 
     await deleteToken(tokenId);
 
-    return Promise.resolve();
+    return Promise.resolve("Update success");
   } catch (err) {
     console.log(err);
     error = err instanceof Error ? err : badImplementationException(err);

@@ -86,7 +86,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
     service.forgotPassword(users[0]);
 
-    res.status(200).json();
+    res.status(200).json("Successfully send email");
   } catch (err: any) {
     logger.error(err);
     res.status(500).json({ message: err });

@@ -8,7 +8,7 @@ export const sendMessage = async (message: MailDataRequired) => {
     // TODO
     await sgMail.send(message);
 
-    return Promise.resolve();
+    return Promise.resolve("Send message success");
   } catch (err) {
     // TODO
     console.error(err);

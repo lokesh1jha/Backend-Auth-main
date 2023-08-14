@@ -39,7 +39,7 @@ export const deleteUser = async (user_id: string) => {
     try {
         const userDoc = db.collection(USER_COLLECTION_KEY).doc(user_id);
         await userDoc.update({ is_deleted: true });
-        return Promise.resolve();
+        return Promise.resolve("success");
     } catch (err) {
         return Promise.reject(err);
     }
