@@ -12,10 +12,10 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
     // TODO
     let decodedToken = decodeJwt(bearer, 'access');
     if(typeof decodedToken === 'string') throw unauthorizedException('Invalid token');
-    let getTokenFromDb = await getToken(decodedToken.user_id);
+    let getTokenFromDb = await getToken(bearer);
     if(!getTokenFromDb) throw unauthorizedException('Invalid token');
     if(getTokenFromDb.token_id !== bearer) throw unauthorizedException('Invalid token');
-    req.user = { user_id: decodedToken.user_id, name: getTokenFromDb.user_type };
+    req.user = { user_id: decodedToken.id, name: getTokenFromDb.user_type };
     next();
   } catch (err) {
     logger.warn(err);

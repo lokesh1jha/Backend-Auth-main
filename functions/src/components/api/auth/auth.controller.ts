@@ -8,7 +8,9 @@ import {
   dataNotExistException,
   unauthorizedException,
 } from '../../../utils/apiErrorHandler';
-import { getUser, getUserByEmail, updateUserFields } from '../../../models/user';
+import { checkPassword, getUser, getUserByEmail, updateUserFields } from '../../../models/user';
+import { addToken, deleteToken } from '../../../models/token';
+import { TokenDocument } from '../../../models/token/token.entity';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,27 +20,40 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     res.status(200).json();
   } catch (err: any) {
     logger.error(err);
-    next(err);
+    res.status(500).json({ message: err });
   }
 };
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { user_id } = req.user;
-    if (!user_id) throw badImplementationException('user_id is not set properly');
+    const { email, password } = req.body;
+    if (!email || !password) throw badImplementationException('email or password is not set properly');
 
     const { ACCESS_TOKEN_EXPIRED_IN, REFRESH_TOKEN_EXPIRED_IN } = process.env;
 
-    const accessToken = encodeJwt({ id: user_id }, ACCESS_TOKEN_EXPIRED_IN || '1m', 'access');
-    const refreshToken = encodeJwt({ id: user_id }, REFRESH_TOKEN_EXPIRED_IN || '2m', 'refresh');
+    let user = await getUserByEmail(email);
+    if (user.length === 0) throw dataNotExistException('Email does not register');
+    let passwordCheck = await checkPassword(email, password);
+    if (!passwordCheck) throw unauthorizedException('Password is not correct');
+
+    const accessToken = encodeJwt({ id: user[0].user_id }, ACCESS_TOKEN_EXPIRED_IN || '1m', 'access');
+    const refreshToken = encodeJwt({ id: user[0].user_id }, REFRESH_TOKEN_EXPIRED_IN || '2m', 'refresh');
 
     // TODO update refresh token
-    await updateUserFields(user_id, { refresh_token: refreshToken, updated_at: getCurrentJST() });
-
+    await updateUserFields(user[0].user_id, { refresh_token: refreshToken, updated_at: getCurrentJST() });
+    let tokenToFirebase : TokenDocument= {
+      token_id: refreshToken,
+      user_id: user[0].user_id,
+      token_type: 'resetPassword',
+      user_type: 'user',
+      created_at: getCurrentJST(),
+      expired_at: '',
+    }
+    await addToken(tokenToFirebase);
     res.status(200).json({ accessToken, refreshToken });
-  } catch (err: any) {
+  } catch (err: any) { 
     logger.error(err);
-    next(err);
+    res.status(500).json({ message: err});
   }
 };
 
@@ -49,11 +64,11 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
 
     // TODO updateUser for make the refresh token to be null
     await updateUserFields(user_id, { refresh_token: null, updated_at: getCurrentJST() });
-
-    res.status(200).json();
-  } catch (err) {
+    await deleteToken(req.headers['authorization']??'');
+    res.status(200).json("Successfully logout");
+  } catch (err: any) {
     logger.error(err);
-    next(err);
+    res.status(500).json({ message: err });
   }
 };
 
@@ -74,7 +89,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     res.status(200).json();
   } catch (err: any) {
     logger.error(err);
-    next(err);
+    res.status(500).json({ message: err });
   }
 };
 
@@ -88,7 +103,7 @@ export const updatePassword = async (req: Request, res: Response, next: NextFunc
     res.status(200).json();
   } catch (err: any) {
     logger.error(err);
-    next(err);
+    res.status(500).json({ message: err });
   }
 };
 
@@ -119,6 +134,6 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     res.status(200).json({ accessToken, refreshToken: newRefreshToken });
   } catch (err: any) {
     logger.error(err);
-    next(err);
+    res.status(500).json({ message: err });
   }
 };

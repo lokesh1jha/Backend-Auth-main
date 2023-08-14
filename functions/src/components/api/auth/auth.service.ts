@@ -21,7 +21,7 @@ export const createUser = async (email: string, password: string, name: string, 
   let error: Error | HttpException | undefined;
   try {
     const user = await getUserByEmail(email);
-    if (user) throw dataConflictException('Email already exists');
+    if (user.length) throw dataConflictException('Email already exists');
 
     let getHashPassword = await hashPassword(password);
 
@@ -41,7 +41,7 @@ export const createUser = async (email: string, password: string, name: string, 
 
     await addUser(newUser);
 
-    return Promise.resolve();
+    return Promise.resolve("Register success");
   }
   catch (err) {
     logger.error(err);
