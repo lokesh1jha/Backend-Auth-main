@@ -64,11 +64,149 @@ Also testing can be done.
 
 ## API Documentation
 
-Briefly describe the project's API endpoints and functionality. You can link to a separate document for detailed API documentation if available.
+## API Endpoints
+
+## API Documentation
+
+| Endpoint                         | Method | Description                            |
+|----------------------------------|--------|----------------------------------------|
+| `/api/auth/register`             | POST   | Register a new user.                   |
+| `/api/auth/login`                | POST   | Log in an existing user.               |
+| `/api/auth/logout`               | POST   | Log out the currently authenticated user. |
+| `/api/auth/password/forgot`      | POST   | Request a password reset for the user's account. |
+| `/api/auth/refresh`              | POST   | Refresh the access token.              |
+| `/api/auth/password/reset`       | PUT    | Reset the password.                   |
+| `/api/account/updateaccount`     | PUT    | Update the account information.       |
+| `/api/account/password`          | PUT    | Update the password.                  |
+| `/api/account/getaccountinfo`    | GET    | Get account information.              |
+
+
+The above table outlines the available API endpoints, their associated HTTP methods, and a brief description of their purposes. Please consult the API documentation for more detailed information about request and response formats, required parameters, and expected outcomes for each endpoint.
+
+# Backend-Auth API Documentation
+
+## Login/Register
+
+### Register User
+
+- **Method:** POST
+- **Endpoint:** `/api/auth/register`
+- **URL:** http://127.0.0.1:5001/backend-auth-willeder/asia-northeast1/api/auth/register
+- **Request Body:**
+    ```json
+    {
+        "email": "lokesh12jha@gmail.com",
+        "password": "Lokesh12@jha",
+        "name": "Lokesh Jha",
+        "phone": "9768523325",
+        "address": "Noida, UP"
+    }
+    ```
+
+### Login User
+
+- **Method:** PUT
+- **Endpoint:** `/api/auth/login`
+- **URL:** http://127.0.0.1:5001/backend-auth-willeder/asia-northeast1/api/auth/login
+- **Request Body:**
+    ```json
+    {
+        "email": "lokesh12jha@gmail.com",
+        "password": "Lokesh12@jha"
+    }
+    ```
+
+### Logout User
+
+- **Method:** PUT
+- **Endpoint:** `/api/auth/logout`
+- **URL:** http://127.0.0.1:5001/backend-auth-willeder/asia-northeast1/api/auth/logout
+- **Request Headers:**
+    ```
+    Authorization: [Access Token]
+    ```
+
+### Forgot Password
+
+- **Method:** PUT
+- **Endpoint:** `/api/auth/password/forgot`
+- **URL:** http://127.0.0.1:5001/backend-auth-willeder/asia-northeast1/api/auth/password/forgot
+- **Request Body:**
+    ```json
+    {
+        "email": "lokesh1jha@gmail.com"
+    }
+    ```
+
+### Refresh Access Token
+
+- **Method:** POST
+- **Endpoint:** `/api/auth/refresh`
+- **URL:** http://127.0.0.1:5001/backend-auth-willeder/asia-northeast1/api/auth/refresh
+- **Request Body:**
+    ```json
+    {
+        "refreshToken": [Refresh Token]
+    }
+    ```
+
+## Account
+
+### Update Account Information
+
+- **Method:** PUT
+- **Endpoint:** `/api/account/updateaccount`
+- **URL:** http://127.0.0.1:5001/backend-auth-willeder/asia-northeast1/api/account/updateaccount
+- **Request Headers:**
+    ```
+    Authorization: [Access Token]
+    ```
+- **Request Body:**
+    ```json
+    {
+        "name": "Lokesh Jha",
+        "phone": "9768523325",
+        "address": "Noida"
+    }
+    ```
+
+### Update Password
+
+- **Method:** PUT
+- **Endpoint:** `/api/account/password`
+- **URL:** http://127.0.0.1:5001/backend-auth-willeder/asia-northeast1/api/account/password
+- **Request Headers:**
+    ```
+    Authorization: [Access Token]
+    ```
+- **Request Body:**
+    ```json
+    {
+        "password": "Lokesh1234@jha"
+    }
+    ```
+
+### Get Account Information
+
+- **Method:** GET
+- **Endpoint:** `/api/account/getaccountinfo`
+- **URL:** http://127.0.0.1:5001/backend-auth-willeder/asia-northeast1/api/account/password
+- **Request Headers:**
+    ```
+    Authorization: [Access Token]
+    ```
+- **Request Body:**
+    ```json
+    {
+        "password": "Lokesh1234@jha"
+    }
+    ```
+
+
 
 ## Tests
 
-Explain how to run tests and provide testing examples.
+To run test 
 
 ```sh
 npm test
