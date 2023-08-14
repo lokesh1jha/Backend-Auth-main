@@ -10,7 +10,7 @@ export const updateAccount = async (user_id: string, name: string, phone: string
     let isUserExsits = await getUserById(user_id);
     if (!isUserExsits) throw badImplementationException('User not found');
     await updateUserFields(user_id, { name, phone, address });
-    return Promise.resolve();
+    return Promise.resolve("Update success");
   } catch (err) {
     logger.error(err);
     error = err instanceof Error ? err : badImplementationException(err);
@@ -26,7 +26,7 @@ export const updatePassword = async (user_id: string, password: string) => {
     if (!isUserExsits) throw badImplementationException('User not found');
     let hashedPassword = await hashPassword(password);
     await updateUserFields(user_id, { password: hashedPassword });
-    return Promise.resolve();
+    return Promise.resolve("Update success");
   } catch (err) {
     logger.error(err);
     error = err instanceof Error ? err : badImplementationException(err);

@@ -1,6 +1,5 @@
 import { ParamSchema, Location } from 'express-validator';
-import { checkPassword, getUserByEmail } from '../models/user';
-import { REGEXP_PASSWORD } from './regexp';
+import { REGEXP_EMAIL, REGEXP_PASSWORD } from './regexp';
 
 export const VALIDATION_STRING = (where: Location): ParamSchema => ({
   in: [where],
@@ -13,13 +12,6 @@ export const VALIDATION_EMAIL_NOT_EXIST = (where: Location): ParamSchema => ({
   isString: true,
   notEmpty: true,
   isEmail: true,
-  custom: {
-    options: async (value: string) => {
-      const user = await getUserByEmail(value);
-      if (user) throw new Error('Email already exists');
-      return true;
-    }
-  }
 });
 
 export const VALIDATION_PASSWORD = (where: Location): ParamSchema => ({
@@ -28,7 +20,6 @@ export const VALIDATION_PASSWORD = (where: Location): ParamSchema => ({
   notEmpty: true,
   isLength: {
     errorMessage: 'Password should be at least 8 chars long',
-    // Multiple options would be expressed as an array
     options: { min: 8 },
   },
   matches: {
@@ -57,27 +48,20 @@ export const VALIDATION_EMAIL_EXIST = (where: Location): ParamSchema => ({
   isString: true,
   notEmpty: true,
   isEmail: true,
-  custom: {
-    options: async (value: string) => {
-      const user = await getUserByEmail(value);
-      if (!user) throw new Error('Email does not exist');
-      return true;
-    }
-  }
+  matches: {
+    options: REGEXP_EMAIL,
+    errorMessage: 'Email is not valid',
+  },
 });
 
 export const VALIDATION_PASSWORD_CHECK = (where: Location, email: string): ParamSchema => ({
   in: [where],
   isString: true,
   notEmpty: true,
-  custom: {
-    options: async (value: string) => {
-      const user = await getUserByEmail(email);
-      if (!user) throw new Error('Email does not exist');
-      if (!checkPassword(email, value)) throw new Error('Password is incorrect');
-      return true;
-    }
-  }
+  matches: {
+    options: REGEXP_PASSWORD,
+    errorMessage: 'Password should be at least one special char, one lowercase, one uppercase, one number',
+  },
 });
 
 export const VALIDATION_TOKEN = (where: Location): ParamSchema => ({

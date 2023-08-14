@@ -14,4 +14,4 @@ export type UserDocument = {
     deleted_at: firestore.Timestamp | null;
 }
 
-export const USER_COLLECTION_KEY = 'User';
+export const USER_COLLECTION_KEY = 'users';
