@@ -12,5 +12,5 @@
     "resolveJsonModule": true
   },
   "compileOnSave": true,
-  "include": ["src"]
+  "include": ["src", "test/controller/account/account.service.generated.test.ts"]
 }
