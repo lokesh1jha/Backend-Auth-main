@@ -8,7 +8,7 @@ import {
   dataNotExistException,
   unauthorizedException,
 } from '../../../utils/apiErrorHandler';
-import { checkPassword, getUser, getUserByEmail, updateUserFields } from '../../../models/user';
+import { checkPassword, getUser, getUserByEmail, getUserById, updateUserFields } from '../../../models/user';
 import { addToken, deleteToken } from '../../../models/token';
 import { TokenDocument } from '../../../models/token/token.entity';
 
@@ -118,10 +118,10 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     }
 
     // TODO get user by id
-    const user = await getUser(decoded.payload.id);
+    const user = await getUserById(decoded.id);
     if (!user) throw unauthorizedException('User is not exist');
     if (user.status !== 'active') throw unauthorizedException('This user is not active');
-    if (user.refreshToken !== refreshToken) throw unauthorizedException('Refresh token is not valid');
+    if (user.refresh_token !== refreshToken) throw unauthorizedException('Refresh token is not valid');
 
     const { ACCESS_TOKEN_EXPIRED_IN, REFRESH_TOKEN_EXPIRED_IN } = process.env;
 
