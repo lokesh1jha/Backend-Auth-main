@@ -53,8 +53,8 @@ Follow these steps to set up and run the project:
    DB_PASSWORD=
    DB_NAME=
 
-6. Build the project: npm run build
-7. Start the Firebase emulators: firebase emulators:start
+6. Build the project: ```npm run build```
+7. Start the Firebase emulators: ```firebase emulators:start```
 
 
 ## Usage
